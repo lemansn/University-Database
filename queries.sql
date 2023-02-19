@@ -1,0 +1,187 @@
+select CoName,Credits
+from COURSE
+where CoName like '%data%';
+
+
+select PERSON.Fname,COUNT(*)
+from PERSON
+where PERSON.Fname like 'c%'
+group by  PERSON.Fname
+HAVING count(*) >=2;
+
+
+SELECT STUDENT.DCode, COUNT(*)
+from STUDENT
+group by DCode
+order by count(*) desc
+limit 1;
+
+
+select count(*)*100/
+       (SELECT count(*) from CURRICULUM) as LangPer
+from DEPARTMENT, CURRICULUM
+where CurrLang like 'ing'
+and DEPARTMENT.DCode = CURRICULUM.DCode;
+
+
+select PersonID
+from PROFFESOR LEft Join DEPARTMENT
+ON  PROFFESOR.PersonID = DEPARTMENT.ChairID
+WHERE DEPARTMENT.ChairID IS NULL ;
+
+
+select COURSE.CoName
+from COURSE,CURRICULUM,SUBJECTS
+where CurrLang like 'ing'
+and SUBJECTS.Subject like '%java%'
+and COURSE.CurrCode = CURRICULUM.CurrCode
+and SUBJECTS.CoCode = COURSE.CoCode;
+
+
+
+SELECT PERSON.Fname,PERSON.Address
+from STUDENT,PERSON,DEPARTMENT
+where PERSON.Address not LIKE  '%Bornova'
+    AND DEPARTMENT.DOffice  LIKE 'Bornova / Izmir'
+    And STUDENT.PersonID = PERSON.PersonID
+    And STUDENT.DCode = DEPARTMENT.DCode;
+
+
+select Area,Fname,PROFFESOR.PersonID
+from AREAS,DEPARTMENT,STUDIES,PROFFESOR,PERSON
+where CStartDate BETWEEN '2020-01-10' And '2023-01-01'
+and TheseType ='Ph.D.'
+and DEPARTMENT.DCode = 1000
+and PROFFESOR.PersonID =PERSON.PersonID
+and (STUDIES.PersonID = AREAS.PersonID and STUDIES.TheseNo = AREAS.TheseNo)
+and DEPARTMENT.ChairID = PROFFESOR.PersonID
+and STUDIES.PersonID = PERSON.PersonID;
+
+
+SELECT count(*)  As	 'Number of course' 
+from DEPARTMENT,THEORETICAL,SECTION,CURRICULUM,COURSE
+where TWeekDays LIKE '__1____'
+and DEPARTMENT.DName LIKE 'EU Department of Computer Engineering'
+and THEORETICAL.SectionID = SECTION.SectionID
+and SECTION.CoCode = COURSE.CoCode
+AND COURSE.CurrCode = CURRICULUM.CurrCode
+AND CURRICULUM.DCode = DEPARTMENT.DCode;
+
+
+select STUDENTNAME.Fname,INSTID.Fname
+from PERSON as STUDENTNAME,PERSON as INSTID,THEORETICAL,SECTION,TAKES,TEACHES,PERSON
+where PERSON.PersonID = INSTID.PersonID
+and SECTION.SectionID = THEORETICAL.SectionID
+and TAKES.SectionID = SECTION.SectionID
+and TAKES.PersonID = STUDENTNAME.PersonID
+and TEACHES.SectionID = SECTION.SectionID
+and TEACHES.InstID = INSTID.PersonID;
+
+
+SELECT PERSON.Fname,PERSON.Lname,PERSON.Address,PERSON.Address,DEPARTMENT.DName
+from DEPARTMENT,FAC_MEMBER,PERSON
+where DEPARTMENT.DCode = FAC_MEMBER.DCode
+and PERSON.PersonID = FAC_MEMBER.PersonID
+order by DEPARTMENT.DName;
+
+
+#her bolumun baskani ve bagli oldugu fakulteler
+select DEPARTMENT.DName as Bolum,CHAIR.Fname as Baskan,COLLEGE.CName as Fakulte
+from DEPARTMENT,PROFFESOR,PERSON as CHAIR,COLLEGE
+where DEPARTMENT.ChairID = CHAIR.PersonID
+and PROFFESOR.PersonID = CHAIR.PersonID
+and COLLEGE.CName = DEPARTMENT.CName;
+
+
+SELECT COLLEGE.CName,DEAN.Fname
+from PROFFESOR,PERSON as DEAN, COLLEGE
+where COLLEGE.DeanID = DEAN.PersonID
+and PROFFESOR.PersonID = DEAN.PersonID;
+
+
+select CoName as Dersler,Fname as Hocalar
+from COURSE,PERSON,INSTRUCTOR,DEPARTMENT,CURRICULUM,SECTION,TEACHES,THEORETICAL, DEPT_MAJOR, PART_OF
+where DEPT_MAJOR.MajorCode = 10
+and DEPT_MAJOR.MajorCode = DEPARTMENT.DArea
+and DEPARTMENT.DCode = CURRICULUM.CurrCode
+and PART_OF.CurrCode = CURRICULUM.CurrCode
+and PART_OF.CoCode = COURSE.CoCode
+and SECTION.CoCode = COURSE.CoCode
+and SECTION.SectionID = THEORETICAL.SectionID
+and TEACHES.SectionID = THEORETICAL.SectionID
+and TEACHES.InstID = INSTRUCTOR.InstID
+and INSTRUCTOR.InstID = PersonID;
+
+
+SELECT COURSE.CoName,COUNT(*) as  OGRENCI_SAY
+FROM DEPT_MAJOR,DEPARTMENT,STUDENT,TAKES,SECTION,COURSE
+WHERE DEPT_MAJOR.MajorCode = DEPARTMENT.DArea
+AND DEPARTMENT.DCode = STUDENT.DCode
+AND TAKES.PersonID = STUDENT.PersonID
+AND TAKES.SectionID = SECTION.SectionID
+AND SECTION.CoCode = COURSE.CoCode
+AND DEPT_MAJOR.MajorCode = 10
+GROUP BY COURSE.CoName
+ORDER BY COUNT(*) desc limit 1;
+
+
+SELECT COURSE.CoName,AVG(Grade)
+FROM STUDENT,TAKES,SECTION,COURSE
+WHERE TAKES.PersonID = STUDENT.PersonID
+AND TAKES.SectionID = SECTION.SectionID
+AND SECTION.CoCode = COURSE.CoCode
+AND COURSE.Credits =(SELECT MAX(Credits)
+FROM COURSE)
+GROUP BY CoName;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#UPDATE DELETE INSERT #UPDATES
+
+UPDATE PERSON
+SET
+    PERSON.Lname = 'Demir',
+    Phone = '5243197359'
+WHERE
+    PersonID = 1056;
+
+UPDATE DEPARTMENT
+SET
+    DEPARTMENT.DOffice = 'Esenyurt / Istanbul'
+WHERE
+    DCode = 1005;
+
+
+UPDATE CURRICULUM
+SET
+    CurrLang = 'fr'
+WHERE
+    CurrCode = 1;
+
+
+
+
+
+
+DELETE FROM STUDENT WHERE STUDENT.PersonID='1005';
+
+DELETE FROM DEPARTMENT WHERE DCode = 1005;
+
+DELETE FROM CURRICULUM WHERE CurrCode = 2;
+
