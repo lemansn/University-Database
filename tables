@@ -1,0 +1,225 @@
+CREATE TABLE `AREAS` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `TheseNo` mediumint NOT NULL,
+  `Area` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`PersonID`,`TheseNo`,`Area`),
+  CONSTRAINT `areas_ibfk_1` FOREIGN KEY (`PersonID`, `TheseNo`) REFERENCES `STUDIES` (`PersonID`, `TheseNo`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9034 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `ASSIST_PROF` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`PersonID`),
+  CONSTRAINT `assist_prof_ibfk_1` FOREIGN KEY (`PersonID`) REFERENCES `INSTRUCTOR` (`InstID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `ASSISTS` (
+  `SectionID` mediumint NOT NULL AUTO_INCREMENT,
+  `AssistID` mediumint NOT NULL,
+  PRIMARY KEY (`SectionID`,`AssistID`),
+  KEY `assists_ibfk_2` (`AssistID`),
+  CONSTRAINT `assists_ibfk_1` FOREIGN KEY (`SectionID`) REFERENCES `SECTION` (`SectionID`),
+  CONSTRAINT `assists_ibfk_2` FOREIGN KEY (`AssistID`) REFERENCES `RES_ASSIST` (`PersonID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `ASSOC_PROF` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`PersonID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `COLLEGE` (
+  `CName` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '',
+  `CPhone` varchar(10) DEFAULT NULL,
+  `COffice` tinytext,
+  `DeanID` mediumint DEFAULT NULL,
+  PRIMARY KEY (`CName`),
+  KEY `college_ibfk_1` (`DeanID`),
+  CONSTRAINT `college_ibfk_1` FOREIGN KEY (`DeanID`) REFERENCES `PROFFESOR` (`PersonID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `COURSE` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  `CoName` tinytext,
+  `CoDesc` tinytext,
+  `Credits` tinyint DEFAULT NULL,
+  `Level` tinyint DEFAULT NULL,
+  `CurrCode` mediumint DEFAULT NULL,
+  `CoType` tinyint DEFAULT NULL,
+  PRIMARY KEY (`CoCode`),
+  KEY `course_ibfk_1` (`CurrCode`),
+  CONSTRAINT `course_ibfk_1` FOREIGN KEY (`CurrCode`) REFERENCES `CURRICULUM` (`CurrCode`) ON DELETE CASCADE,
+  CONSTRAINT `CHK_credit` CHECK ((`Credits` between 1 and 12))
+) ENGINE=InnoDB AUTO_INCREMENT=1371 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `CURRICULUM` (
+  `CurrCode` mediumint NOT NULL AUTO_INCREMENT,
+  `Validity` year DEFAULT NULL,
+  `EdType` tinyint(1) DEFAULT NULL,
+  `EdLang` varchar(5) DEFAULT NULL,
+  `DCode` mediumint DEFAULT NULL,
+  PRIMARY KEY (`CurrCode`),
+  KEY `DCode` (`DCode`),
+  CONSTRAINT `curriculum_ibfk_1` FOREIGN KEY (`DCode`) REFERENCES `DEPARTMENT` (`DCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=100016 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `DEPARTMENT` (
+  `DCode` mediumint NOT NULL AUTO_INCREMENT,
+  `DName` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `DOffice` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `DPhone` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `DArea` tinyint DEFAULT NULL,
+  `CName` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `ChairID` mediumint DEFAULT NULL,
+  `CStartDate` date DEFAULT NULL,
+  PRIMARY KEY (`DCode`),
+  KEY `department_ibfk_1` (`CName`),
+  KEY `department_ibfk_3` (`DArea`),
+  KEY `department_ibfk_4` (`ChairID`),
+  CONSTRAINT `department_ibfk_1` FOREIGN KEY (`CName`) REFERENCES `COLLEGE` (`CName`),
+  CONSTRAINT `department_ibfk_3` FOREIGN KEY (`DArea`) REFERENCES `DEPT_MAJOR` (`MajorCode`),
+  CONSTRAINT `department_ibfk_4` FOREIGN KEY (`ChairID`) REFERENCES `PROFFESOR` (`PersonID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1010 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `DEPT_MAJOR` (
+  `MajorCode` tinyint NOT NULL AUTO_INCREMENT,
+  `MajorName` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`MajorCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `FAC_MEMBER` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `DCode` mediumint DEFAULT NULL,
+  `LecType` tinyint DEFAULT NULL,
+  PRIMARY KEY (`PersonID`),
+  KEY `fac_member_ibfk_2` (`DCode`),
+  CONSTRAINT `fac_member_ibfk_1` FOREIGN KEY (`PersonID`) REFERENCES `PERSON` (`PersonID`) ON DELETE CASCADE,
+  CONSTRAINT `fac_member_ibfk_2` FOREIGN KEY (`DCode`) REFERENCES `DEPARTMENT` (`DCode`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `INSTRUCTOR` (
+  `InstID` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`InstID`),
+  CONSTRAINT `instructor_ibfk_1` FOREIGN KEY (`InstID`) REFERENCES `FAC_MEMBER` (`PersonID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `LABORATORY` (
+  `SectionID` mediumint NOT NULL AUTO_INCREMENT,
+  `LWeekDays` binary(5) DEFAULT NULL,
+  `LBuilding` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `LRoomNo` tinyint DEFAULT NULL,
+  PRIMARY KEY (`SectionID`),
+  CONSTRAINT `laboratory_ibfk_1` FOREIGN KEY (`SectionID`) REFERENCES `SECTION` (`SectionID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=100172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `MANDATORY` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`CoCode`),
+  CONSTRAINT `mandatory_ibfk_1` FOREIGN KEY (`CoCode`) REFERENCES `COURSE` (`CoCode`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1361 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `N_TECHNICAL` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`CoCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=1114 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `OPTIONAL` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`CoCode`),
+  CONSTRAINT `optional_ibfk_1` FOREIGN KEY (`CoCode`) REFERENCES `COURSE` (`CoCode`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1356 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `PERSON` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `Fname` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Mname` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Lname` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Phone` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `Address` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  PRIMARY KEY (`PersonID`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `PROFFESOR` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`PersonID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `RES_ASSIST` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`PersonID`)
+) ENGINE=InnoDB AUTO_INCREMENT=9163 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `SECTION` (
+  `SectionID` mediumint NOT NULL AUTO_INCREMENT,
+  `Semester` tinyint(1) DEFAULT NULL,
+  `SecYear` year DEFAULT NULL,
+  `CoCode` mediumint DEFAULT NULL,
+  PRIMARY KEY (`SectionID`),
+  KEY `section_ibfk_1` (`CoCode`),
+  CONSTRAINT `section_ibfk_1` FOREIGN KEY (`CoCode`) REFERENCES `COURSE` (`CoCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=100172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `STUDENT` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `DOB` date DEFAULT NULL,
+  `DCode` mediumint DEFAULT NULL,
+  PRIMARY KEY (`PersonID`),
+  KEY `student_ibfk_1` (`DCode`),
+  CONSTRAINT `student_ibfk_1` FOREIGN KEY (`DCode`) REFERENCES `DEPARTMENT` (`DCode`) ON DELETE CASCADE,
+  CONSTRAINT `student_ibfk_2` FOREIGN KEY (`PersonID`) REFERENCES `PERSON` (`PersonID`),
+  CONSTRAINT `CHK_age` CHECK ((_utf8mb4'2004-01-01' > `DOB`))
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `STUDIES` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `TheseNo` mediumint NOT NULL,
+  `TheseName` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `TheseType` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `PubYear` year DEFAULT NULL,
+  PRIMARY KEY (`PersonID`,`TheseNo`),
+  CONSTRAINT `studies_ibfk_1` FOREIGN KEY (`PersonID`) REFERENCES `PERSON` (`PersonID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9034 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `SUBJECTS` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  `Subject` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`CoCode`,`Subject`),
+  CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`CoCode`) REFERENCES `COURSE` (`CoCode`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1305 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `TAKES` (
+  `PersonID` mediumint NOT NULL AUTO_INCREMENT,
+  `SectionID` mediumint NOT NULL,
+  `SecPoint` tinyint DEFAULT NULL,
+  PRIMARY KEY (`PersonID`,`SectionID`),
+  KEY `SectionID` (`SectionID`),
+  CONSTRAINT `takes_ibfk_1` FOREIGN KEY (`PersonID`) REFERENCES `STUDENT` (`PersonID`) ON DELETE CASCADE,
+  CONSTRAINT `takes_ibfk_2` FOREIGN KEY (`SectionID`) REFERENCES `SECTION` (`SectionID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1128 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `TEACHES` (
+  `SectionID` mediumint NOT NULL AUTO_INCREMENT,
+  `InstID` mediumint NOT NULL,
+  PRIMARY KEY (`SectionID`,`InstID`),
+  KEY `InstID` (`InstID`),
+  CONSTRAINT `teaches_ibfk_1` FOREIGN KEY (`SectionID`) REFERENCES `SECTION` (`SectionID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=100122 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `TECHNICAL` (
+  `CoCode` mediumint NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`CoCode`),
+  CONSTRAINT `technical_ibfk_1` FOREIGN KEY (`CoCode`) REFERENCES `OPTIONAL` (`CoCode`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1356 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `THEORETICAL` (
+  `SectionID` mediumint NOT NULL AUTO_INCREMENT,
+  `TWeekDays` binary(5) DEFAULT NULL,
+  `TBuilding` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `TRoomNo` tinyint DEFAULT NULL,
+  PRIMARY KEY (`SectionID`),
+  CONSTRAINT `theoretical_ibfk_1` FOREIGN KEY (`SectionID`) REFERENCES `SECTION` (`SectionID`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=100155 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
